@@ -1,6 +1,5 @@
 #include "cpu.h"
 #include "common.h"
-#include <string.h>
 
 uint8_t memory[MEMORY_SIZE] = {0};
 uint8_t registers[REGISTER_COUNT] = {0};
@@ -50,7 +49,9 @@ void load_rom(char* filename) {
 }
 
 void OP_00E0() {
-	memset(video, 0, sizeof(video));
+	for (int i = 0; i < VIDEO_WIDTH * VIDEO_HEIGHT; i++) {
+		video[i] = 0;
+	}
 }
 void OP_00EE() {
 	pc = stack[sp];
