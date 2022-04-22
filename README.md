@@ -6,6 +6,19 @@ This a CHIP-8 emulator/interpreter I programmed in the C Programming Language , 
 
 Below are some screenshots to show the project. 
 
+<!-- <img src="..screenshots/../screenshots/nfd.png" width="450"> -->
+File Dialog           |
+:-------------------------:|
+<img src="..screenshots/../screenshots/nfd.png" width="450">    |
+
+Opcode Test Rom             |  BC Test Rom
+:-------------------------:|:-------------------------:
+<img src="..screenshots/../screenshots/opcode-test.png" width="450">  |  <img src="..screenshots/../screenshots/bc-test.png" width="450">
+
+Tetris             |  Pong
+:-------------------------:|:-------------------------:
+<img src="..screenshots/../screenshots/tetris.png" width="450">  |  <img src="..screenshots/../screenshots/pong.png" width="450">
+
 # Build Instructions
 
 ## Linux
@@ -83,7 +96,6 @@ To run from the build directory:
 |A|0|B|F|    |Z|X|C|V|
 +-+-+-+-+    +-+-+-+-+ -->
 
-
 # Special Thanks To
 
 This project wouldn't have been possible without these valuable resouces
@@ -92,4 +104,5 @@ This project wouldn't have been possible without these valuable resouces
 - https://github.com/btzy/nativefiledialog-extended
 - https://austinmorlan.com/posts/chip8_emulator/#how-does-a-cpu-work
 - https://github.com/JadedTuna/chip8
+- https://stackoverflow.com/questions/10110905/simple-sound-wave-generator-with-sdl-in-c/45002609#45002609
 - http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
