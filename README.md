@@ -5,11 +5,11 @@ This a CHIP-8 emulator/interpreter I programmed in the C Programming Language , 
 # Screenshots
 
 Below are some screenshots to show the project. 
-
-<!-- <img src="..screenshots/../screenshots/nfd.png" width="450"> -->
+<div align="center">
 File Dialog           |
 :-------------------------:|
 <img src="..screenshots/../screenshots/nfd.png" width="450">    |
+</div>
 
 Opcode Test Rom             |  BC Test Rom
 :-------------------------:|:-------------------------:
@@ -65,6 +65,7 @@ To run from the build directory:
 
 # Key Mappings
 
+<div align="center">
 <table>
 <tr><th> <center> CHIP-8 </th><th> <center>Keyboard</th></tr>
 <tr><td>
@@ -85,16 +86,7 @@ To run from the build directory:
 
 </td></tr> </table>
 
-<!-- Keypad       Keyboard
-+-+-+-+-+    +-+-+-+-+
-|1|2|3|C|    |1|2|3|4|
-+-+-+-+-+    +-+-+-+-+
-|4|5|6|D|    |Q|W|E|R|
-+-+-+-+-+ => +-+-+-+-+
-|7|8|9|E|    |A|S|D|F|
-+-+-+-+-+    +-+-+-+-+
-|A|0|B|F|    |Z|X|C|V|
-+-+-+-+-+    +-+-+-+-+ -->
+</div>
 
 # Special Thanks To
 
