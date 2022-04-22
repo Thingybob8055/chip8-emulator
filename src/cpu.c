@@ -1,6 +1,6 @@
 #include "cpu.h"
-#include <time.h>
 #include "common.h"
+#include <string.h>
 
 uint8_t memory[MEMORY_SIZE] = {0};
 uint8_t registers[REGISTER_COUNT] = {0};
@@ -36,7 +36,6 @@ uint8_t fontset[FONTSET_SIZE] =
 };
 
 void load_font() {
-    srand((unsigned int) time(NULL));
     for (int i = 0; i < 80; i++) {
         memory[i] = fontset[i];
     }
@@ -44,21 +43,242 @@ void load_font() {
 
 void load_rom(char* filename) {
     FILE* fp = fopen(filename, "rb");
-    fseek(fp, 0, SEEK_END);
-
-    long size = ftell(fp);
-    rewind(fp);
-
-    uint8_t* buffer = (uint8_t*)malloc((size + 1)*sizeof(uint8_t));
-    fread(buffer, size, 1, fp);
-    fclose(fp);
-
-    for (int i = 0; i < size; i++) {
-        memory[512 + i] = buffer[i]; // first 512 bytes are reserved
+    int data;
+    for (int i = 0; (data = fgetc(fp)) != EOF; i++) {
+        memory[START_ADDRESS + i] = data; // first 512 bytes are reserved
     }
+}
 
-    free(buffer);
+void OP_00E0() {
+	memset(video, 0, sizeof(video));
+}
+void OP_00EE() {
+	pc = stack[sp];
+	sp--;
+}
+void OP_1nnn(uint16_t opcode) {
+	uint16_t address = opcode & 0x0FFF;
+	pc = address;
+}
+void OP_2nnn(uint16_t opcode) {
+	uint16_t address = opcode & 0x0FFF;
+	sp++;
+	stack[sp] = pc;
+	pc = address;
+}
+void OP_3xkk(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t byte = opcode & 0x00FF;
+	if (registers[Vx] == byte)
+	{
+		pc += 2;
+	}
+}
+void OP_4xkk(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t byte = opcode & 0x00FF;
+	if (registers[Vx] != byte)
+	{
+		pc += 2;
+	}
+}
+void OP_5xy0(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	if (registers[Vx] == registers[Vy]) {
+		pc += 4;
+	} 
+	else {
+		pc += 2;
+	}
+}
+void OP_6xkk(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t byte = opcode & 0x00FF;
+	registers[Vx] = byte;
+}
+void OP_7xkk(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t byte = opcode & 0x00FF;
+	registers[Vx] += byte;
+}
+void OP_8xy0(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	registers[Vx] = registers[Vy];
+}
+void OP_8xy1(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	registers[Vx] |= registers[Vy];
+}
+void OP_8xy2(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	registers[Vx] &= registers[Vy];
+}
+void OP_8xy3(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	registers[Vx] ^= registers[Vy];
+}
+void OP_8xy4(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	uint16_t sum = registers[Vx] + registers[Vy];
+	if (sum > 255)
+	{
+		registers[0xF] = 1;
+	}
+	else
+	{
+		registers[0xF] = 0;
+	}
+	registers[Vx] = sum & 0xFF;
+}
+void OP_8xy5(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	if (registers[Vx] > registers[Vy])
+	{
+		registers[0xF] = 1;
+	}
+	else
+	{
+		registers[0xF] = 0;
+	}
+	registers[Vx] -= registers[Vy];
+}
+void OP_8xy6(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	// Save LSB in VF
+	registers[0xF] = (registers[Vx] & 0x1);
+	registers[Vx] >>= 1;
+}
+void OP_8xy7(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	if (registers[Vy] > registers[Vx])
+	{
+		registers[0xF] = 1;
+	}
+	else
+	{
+		registers[0xF] = 0;
+	}
+	registers[Vx] = registers[Vy] - registers[Vx];
+}
+void OP_8xyE(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	// Save MSB in VF
+	registers[0xF] = (registers[Vx] & 0x80) >> 7;
+	registers[Vx] <<= 1;
+}
+void OP_9xy0(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	if (registers[Vx] != registers[Vy])
+	{
+		pc += 2;
+	}
+}
+void OP_Annn(uint16_t opcode) {
+	uint16_t address = opcode & 0x0FFF;
+	INDEX = address;
+}
+void OP_Bnnn(uint16_t opcode) {
+	uint16_t address = opcode & 0x0FFF;
+	pc = registers[0] + address;
+}
+void OP_Cxkk(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	registers[Vx] = rand() & (opcode & 0x00FF);
+}
+void OP_Dxyn(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t Vy = (opcode & 0x00F0) >> 4;
+	draw_flag = 1;
+	uint16_t height = opcode & 0x000F;
+	uint16_t pixel;
 
+	registers[0xF] = 0;
+	for(int y = 0; y< height; y++) {
+		pixel = memory[INDEX + y];
+		for(int x = 0; x<8; x++) {
+			if((pixel & (0x80 >> x)) != 0 ) {
+				if(video[(registers[Vx] + x + ((registers[Vy] + y)*VIDEO_WIDTH))] == 1) {
+					registers[0xF] = 1;
+				}
+				video[registers[Vx] + x + ((registers[Vy] + y) * VIDEO_WIDTH)] ^= 1;
+			}
+		}
+	}
+}
+void OP_Ex9E(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	if(keypad[registers[Vx]]) {
+		pc += 2;
+	}
+}
+void OP_ExA1(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	if(!keypad[registers[Vx]]) {
+		pc += 2;
+	}
+}
+void OP_Fx07(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	registers[Vx] = delay_timer;
+}
+void OP_Fx0A(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	for(int i = 0; i<16; i++) {
+		if(keypad[i]){
+			registers[Vx] = i;
+			pc += 2;
+			break;
+		}
+	}
+}
+void OP_Fx15(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	delay_timer = registers[Vx];
+}
+void OP_Fx18(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	sound_timer = registers[Vx];
+}
+void OP_Fx1E(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	INDEX += registers[Vx];
+}
+void OP_Fx29(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t digit = registers[Vx];
+	INDEX = registers[Vx] * 5;
+}
+void OP_Fx33(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	uint8_t value = registers[Vx];
+	memory[INDEX + 2] = value % 10;
+	value /= 10;
+	memory[INDEX + 1] = value % 10;
+	value /= 10;
+	memory[INDEX] = value % 10;
+}
+void OP_Fx55(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	for (int i = 0; i <= Vx; ++i)
+	{
+		memory[INDEX + i] = registers[i];
+	}
+}
+void OP_Fx65(uint16_t opcode) {
+	uint8_t Vx = (opcode & 0x0F00) >> 8;
+	for (int i = 0; i <= Vx; ++i)
+	{
+		registers[i] = memory[INDEX + i];
+	}
 }
 
 void cpu_cycle() {
@@ -72,14 +292,11 @@ void cpu_cycle() {
 		case 0x0000:
 			switch (opcode & 0x00FF) {
 				case 0x00E0:
-					 for (int i = 0; i < 64 * 32; i++) {
-                        video[i] = 0;
-                    }
+					OP_00E0();
 					pc += 2;
 					break;
 				case 0x00EE:
-					pc = stack[sp];
-					sp--;
+					OP_00EE();
 					pc += 2;
 					break;
 				default:
@@ -88,100 +305,66 @@ void cpu_cycle() {
 			}
 			break;
 		case 0x1000:
-			pc = opcode & 0xFFF;
+			OP_1nnn(opcode);
 			break;
 		case 0x2000:
-			sp++;
-			stack[sp] = pc;
-			pc = opcode & 0x0FFF;
+			OP_2nnn(opcode);
 			break;
 		case 0x3000:
-			if (registers[Vx] == (opcode & 0x00FF)) {
-				pc += 2;
-			}
+			OP_3xkk(opcode);
 			pc += 2;
 			break;
 		case 0x4000:
-			if (registers[Vx] != (opcode & 0x00FF)) {
-				pc += 2;
-			}
+			OP_4xkk(opcode);
 			pc += 2;
 			break;
 		case 0x5000:
-			if (registers[Vx] == registers[Vy]) {
-				pc += 4;
-			} 
-			else {
-				pc += 2;
-			}
+			OP_5xy0(opcode);
 			break;
 		case 0x6000:
-			registers[Vx] = opcode & 0x00FFu;
+			OP_6xkk(opcode);
 			pc += 2;
 			break;
 		case 0x7000:
-			registers[Vx] += opcode & 0x00FF;
+			OP_7xkk(opcode);
 			pc += 2;
 			break;
 		case 0x8000:
 			switch (opcode & 0x000F){
 				case 0x0000:
-					registers[Vx] = registers[Vy];
+					OP_8xy0(opcode);
 					pc += 2;
 					break;
 				case 0x0001:
-					registers[Vx] |= registers[Vy];
+					OP_8xy1(opcode);
 					pc += 2;
 					break;
 				case 0x0002:
-					registers[Vx] &= registers[Vy];
+					OP_8xy2(opcode);
 					pc += 2;
 					break;
 				case 0x0003:;
-					registers[Vx] ^= registers[Vy];
+					OP_8xy3(opcode);
 					pc += 2;
 					break;
 				case 0x0004:
-					registers[0xF] = 0;
-					if( (registers[Vx] + registers[Vy]) >0xFF ) {
-						registers[0xF] = 1;
-					}
-					registers[Vx] +=  registers[Vy];
+					OP_8xy4(opcode);
 					pc += 2;
 					break;
 				case 0x0005:
-					if (registers[Vx] > registers[Vy]) {
-						registers[0xF] = 1;
-					}
-					else {
-						registers[0xF] = 0;
-					}
-
-					registers[Vx] -= registers[Vy];
+					OP_8xy5(opcode);
 					pc += 2;
 					break;
 				case 0x0006:
-					// Save LSB in VF
-					registers[0xF] = (registers[Vx] & 0x1);
-
-					registers[Vx] >>= 1;
+					OP_8xy6(opcode);
 					pc += 2;
 					break;
 				case 0x0007:
-					if (registers[Vy] > registers[Vx]) {
-						registers[0xF] = 1;
-					}
-					else {
-						registers[0xF] = 0;
-					}
-
-					registers[Vx] = registers[Vy] - registers[Vx];
+					OP_8xy7(opcode);
 					pc += 2;
 					break;
 				case 0x000E:
-					// Save MSB in VF
-					registers[0xF] = (registers[Vx] & 0x80) >> 7u;
-					registers[Vx] <<= 1;
+					OP_8xyE(opcode);
 					pc += 2;
 					break;
 				default:
@@ -190,53 +373,32 @@ void cpu_cycle() {
 			}
 			break;
 		case 0x9000:
-			if (registers[Vx] != registers[Vy]) {
-				pc += 2;
-			}
+			OP_9xy0(opcode);
 			pc += 2;
 			break;
 		case 0xA000:
-			INDEX = opcode & 0xFFF;
+			OP_Annn(opcode);
 			pc += 2;
 			break;
 		case 0xB000:
-			pc = registers[0] + (opcode & 0xFFF);
+			OP_Bnnn(opcode);
 			break;
 		case 0xC000:
-			registers[Vx] = rand() & (opcode & 0x00FF);
+			OP_Cxkk(opcode);
 			pc += 2;
 			break;
 		case 0xD000:
-			draw_flag = 1;
-			uint16_t height = opcode & 0x000F;
-			uint16_t pixel;
-
-			registers[0xF] = 0;
-			for(int y = 0; y< height; y++) {
-				pixel = memory[INDEX + y];
-				for(int x = 0; x<8; x++) {
-					if((pixel & (0x80 >> x)) != 0 ) {
-						if(video[(registers[Vx] + x + ((registers[Vy] + y)*VIDEO_WIDTH))] == 1) {
-							registers[0xF] = 1;
-						}
-						video[registers[Vx] + x + ((registers[Vy] + y) * VIDEO_WIDTH)] ^= 1;
-					}
-				}
-			}
+			OP_Dxyn(opcode);
 			pc += 2;
 			break;
 		case 0xE000:
 			switch (opcode & 0x00FF) {
 				case 0x009E:
-					if(keypad[registers[Vx]]) {
-						pc += 2;
-					}
+					OP_Ex9E(opcode);
 					pc += 2;
 					break;
 					case 0x00A1:
-					if(!keypad[registers[Vx]]) {
-						pc += 2;
-					}
+					OP_ExA1(opcode);
 					pc += 2;
 					break;
 				default:
@@ -247,54 +409,38 @@ void cpu_cycle() {
 		case 0xF000:
 			switch (opcode & 0x00FF) {
 				case 0x0007:
-					registers[Vx] = delay_timer;
+					OP_Fx07(opcode);
 					pc += 2;
 					break;
 				case 0x000A:
-					for(int i = 0; i<16; i++) {
-						if(keypad[i]){
-							registers[Vx] = i;
-							pc += 2;
-                            break;
-						}
-					}
+					OP_Fx0A(opcode);
 					break;
 				case 0x0015:
-					delay_timer = registers[Vx];
+					OP_Fx15(opcode);
 					pc += 2;
 					break;
 				case 0x0018:
-					sound_timer = registers[Vx];
+					OP_Fx18(opcode);
 					pc += 2;
 					break;
 				case 0x001E:
-					INDEX += registers[Vx];
+					OP_Fx1E(opcode);
 					pc += 2;
 					break;
 				case 0x0029:
-					INDEX = registers[Vx] * 5;
+					OP_Fx29(opcode);
 					pc += 2;
 					break;
-				case 0x0033: // 0xFX33: store BCD(V[x]) in I, I+1, I+2
-                    // The interpreter takes the decimal value of V[x],
-                    // and places the hundreds digit in memory at location in I,
-                    // the tens digit at location I+1, and the ones digit at 
-                    // location I+2.
-                    memory[INDEX] = registers[Vx] / 100;
-                    memory[INDEX + 1] = registers[Vx] % 100 / 10;
-                    memory[INDEX + 2] = registers[Vx] % 10;
+				case 0x0033: 
+					OP_Fx33(opcode);
                     pc += 2;
                     break;
-                case 0x0055: // 0xFX55: store V[0] through V[x] in memory starting at location I
-                    for (int i = 0; i <= Vx; i++) {
-                        memory[INDEX + i] = registers[i];
-                    }
+                case 0x0055:
+                    OP_Fx55(opcode);
                     pc += 2;
                     break;
-                case 0x0065: // 0xFX65: load V[0] through V[x] from memory starting at location I
-                    for (int i = 0; i <= Vx; i++) {
-                        registers[i] = memory[INDEX + i];
-                    }
+                case 0x0065:
+                    OP_Fx65(opcode);
                     pc += 2;
                     break;
                 default:
@@ -311,7 +457,6 @@ void cpu_cycle() {
         delay_timer--;
     }
 
-    // beep and update sound timer
     if (sound_timer > 0) {
         sound_flag = 1;
         sound_timer--;
