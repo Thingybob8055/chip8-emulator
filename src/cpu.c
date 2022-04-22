@@ -285,8 +285,6 @@ void cpu_cycle() {
 	draw_flag = 0;
 	sound_flag = 0;
 	uint16_t opcode = memory[pc] << 8 | memory[pc + 1];
-	uint8_t Vx = (opcode & 0x0F00) >> 8;
-    uint8_t Vy = (opcode & 0x00F0) >> 4;
 
 	switch (opcode & 0xF000) {
 		case 0x0000:
