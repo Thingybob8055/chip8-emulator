@@ -28,7 +28,7 @@ Tetris             |  Pong
 
 ## Linux
 
-Firs, CMAKE and SDL2 installed:
+First, CMAKE and SDL2 needs to be installed:
 
 ```bash
 sudo apt-get install cmake libsdl2-dev
