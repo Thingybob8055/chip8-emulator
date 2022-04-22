@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.2)
+project(chip8)
+
+set(CMAKE_CXX_STANDARD 11)
+add_subdirectory(nativefiledialog-extended-master)
+INCLUDE(FindPkgConfig)
+IF (WIN32)
+    set(SDL2_PATH "C:\\msys64\\mingw64\\x86_64-w64-mingw32")
+    set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+ELSE()
+    PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
+ENDIF()
+
+
+find_package(SDL2 REQUIRED)
+set(SOURCE_FILES src/chip8.c src/cpu.c src/ui.c src/cpu.h src/ui.h src/audio.h src/audio.c)
+add_executable(chip8 ${SOURCE_FILES})
+
+IF (WIN32)
+    INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS})
+    include_directories( ${SDL2_INCLUDE_DIR} )
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARY})
+ELSE()
+    INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS})
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${SDL2_LIBRARIES})
+ENDIF()
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} nfd)
