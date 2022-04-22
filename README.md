@@ -90,16 +90,9 @@ To run from the build directory:
 
 </td></tr> </table>
 
-<!-- Keypad       Keyboard
-+-+-+-+-+    +-+-+-+-+
-|1|2|3|C|    |1|2|3|4|
-+-+-+-+-+    +-+-+-+-+
-|4|5|6|D|    |Q|W|E|R|
-+-+-+-+-+ => +-+-+-+-+
-|7|8|9|E|    |A|S|D|F|
-+-+-+-+-+    +-+-+-+-+
-|A|0|B|F|    |Z|X|C|V|
-+-+-+-+-+    +-+-+-+-+ -->
+# Libraries Used
+
+I used this open source [nativefiledialog-extended](https://github.com/btzy/nativefiledialog-extended) library in order to implement the file dialog feature.
 
 # Special Thanks To
 
