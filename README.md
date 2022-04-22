@@ -1,6 +1,6 @@
 # CHIP-8 Emulator/Interpreter
 
-This a CHIP-8 emulator/interpreter I programmed in the C Programming Language , mainly for practicing C programming, learnng about computer architecture concepts, reading assembly code etc. CHIP-8 is an interpreted programming language. More info on CHIP-* can be found in the [Wikipedia Page](https://en.wikipedia.org/wiki/CHIP-8).
+This a CHIP-8 emulator/interpreter I programmed in the C Programming Language , mainly for practicing C programming, learnng about computer architecture concepts, reading assembly code etc. CHIP-8 is an interpreted programming language. More info on CHIP-8 can be found in the [Wikipedia Page](https://en.wikipedia.org/wiki/CHIP-8).
 
 # Screenshots
 
