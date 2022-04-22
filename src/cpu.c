@@ -44,7 +44,7 @@ void load_rom(char* filename) {
     FILE* fp = fopen(filename, "rb");
     int data;
     for (int i = 0; (data = fgetc(fp)) != EOF; i++) {
-        memory[START_ADDRESS + i] = data; // first 512 bytes are reserved
+        memory[START_ADDRESS + i] = data; 
     }
 }
 
