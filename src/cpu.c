@@ -70,16 +70,14 @@ void OP_2nnn(uint16_t opcode) {
 void OP_3xkk(uint16_t opcode) {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
 	uint8_t byte = opcode & 0x00FF;
-	if (registers[Vx] == byte)
-	{
+	if (registers[Vx] == byte) {
 		pc += 2;
 	}
 }
 void OP_4xkk(uint16_t opcode) {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
 	uint8_t byte = opcode & 0x00FF;
-	if (registers[Vx] != byte)
-	{
+	if (registers[Vx] != byte) {
 		pc += 2;
 	}
 }
@@ -127,12 +125,10 @@ void OP_8xy4(uint16_t opcode) {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
 	uint8_t Vy = (opcode & 0x00F0) >> 4;
 	uint16_t sum = registers[Vx] + registers[Vy];
-	if (sum > 255)
-	{
+	if (sum > 255) {
 		registers[0xF] = 1;
 	}
-	else
-	{
+	else {
 		registers[0xF] = 0;
 	}
 	registers[Vx] = sum & 0xFF;
@@ -140,12 +136,10 @@ void OP_8xy4(uint16_t opcode) {
 void OP_8xy5(uint16_t opcode) {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
 	uint8_t Vy = (opcode & 0x00F0) >> 4;
-	if (registers[Vx] > registers[Vy])
-	{
+	if (registers[Vx] > registers[Vy]) {
 		registers[0xF] = 1;
 	}
-	else
-	{
+	else {
 		registers[0xF] = 0;
 	}
 	registers[Vx] -= registers[Vy];
@@ -159,12 +153,10 @@ void OP_8xy6(uint16_t opcode) {
 void OP_8xy7(uint16_t opcode) {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
 	uint8_t Vy = (opcode & 0x00F0) >> 4;
-	if (registers[Vy] > registers[Vx])
-	{
+	if (registers[Vy] > registers[Vx]) {
 		registers[0xF] = 1;
 	}
-	else
-	{
+	else {
 		registers[0xF] = 0;
 	}
 	registers[Vx] = registers[Vy] - registers[Vx];
@@ -178,8 +170,7 @@ void OP_8xyE(uint16_t opcode) {
 void OP_9xy0(uint16_t opcode) {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
 	uint8_t Vy = (opcode & 0x00F0) >> 4;
-	if (registers[Vx] != registers[Vy])
-	{
+	if (registers[Vx] != registers[Vy]) {
 		pc += 2;
 	}
 }
@@ -269,15 +260,13 @@ void OP_Fx33(uint16_t opcode) {
 }
 void OP_Fx55(uint16_t opcode) {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
-	for (int i = 0; i <= Vx; ++i)
-	{
+	for (int i = 0; i <= Vx; ++i) {
 		memory[INDEX + i] = registers[i];
 	}
 }
 void OP_Fx65(uint16_t opcode) {
 	uint8_t Vx = (opcode & 0x0F00) >> 8;
-	for (int i = 0; i <= Vx; ++i)
-	{
+	for (int i = 0; i <= Vx; ++i) {
 		registers[i] = memory[INDEX + i];
 	}
 }
