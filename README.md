@@ -14,7 +14,7 @@ Below are some screenshots to show the project.
 | <img src="..screenshots/../screenshots/nfd.png" width="450">|
 
  </table>
-</div>
+
 
 Opcode Test Rom             |  BC Test Rom
 :-------------------------:|:-------------------------:
@@ -23,6 +23,8 @@ Opcode Test Rom             |  BC Test Rom
 Tetris             |  Pong
 :-------------------------:|:-------------------------:
 <img src="..screenshots/../screenshots/tetris.png" width="450">  |  <img src="..screenshots/../screenshots/pong.png" width="450">
+
+</div>
 
 # Build Instructions
 
