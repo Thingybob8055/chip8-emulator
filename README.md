@@ -65,7 +65,7 @@ make
 ```
 To run from the build directory:
 ```bash
-.\chip8
+.\chip8.exe
 ```
 
 # Key Mappings
