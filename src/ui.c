@@ -20,6 +20,7 @@ void ui_init() {
     }
 	SDL_CreateWindowAndRenderer(SCREEN_WIDTH*8, SCREEN_HEIGHT*8, 0, &window, &renderer);
 	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH*8, SCREEN_HEIGHT*8);
+	SDL_SetWindowResizable(window, SDL_TRUE);
 	SDL_SetWindowTitle(window, "CHIP-8 EMULATOR");
 }
 
