@@ -16,7 +16,7 @@ void audio_callback(void *user_data, unsigned char *raw_buffer, int bytes) {
         buffer[i] = (Sint16)(amplitude * sin(2.0f * M_PI * 441.0f * time)); // render 441 HZ sine wave
     }
 }
-
+//beep
 void beep() {
     int sample_nr = 0;
 
