@@ -69,6 +69,29 @@ To run from the build directory:
 ```bash
 .\chip8.exe
 ```
+Or you can also run by double clicking the .exe file
+
+## MacOS
+
+Homebrew is required to install SDL2 and cmake. Homebrew insallation instructions can be found [here](https://brew.sh).
+
+Install the following using the commands:
+```bash
+brew install sdl2
+brew install sdl2_ttf
+brew install cmake
+```
+To build from terminal:
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
+Run from the build directory using:
+```
+./gbemu/gbemu 
+```
 
 # Key Mappings
 
