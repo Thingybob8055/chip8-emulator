@@ -23,8 +23,6 @@ int main() {
         exit(-1);
     }
 
-    NFD_Quit();
-
 	printf("OPENED: %s\n", (char*)outPath);
 
     load_font();
@@ -53,6 +51,7 @@ int main() {
 		delay(3);
 	}
 	
+    NFD_Quit();
 	stop_display();
     stop_audio();
 
