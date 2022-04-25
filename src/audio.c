@@ -2,7 +2,7 @@
 #include "common.h"
 #include <math.h>
 #include <SDL2/SDL.h>
-//
+
 void audio_callback(void *user_data, unsigned char *raw_buffer, int bytes) {
     double sample_rate = 44100.0;
     int amplitude = 28000;
