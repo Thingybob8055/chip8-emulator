@@ -36,6 +36,12 @@ First, CMAKE and SDL2 needs to be installed:
 sudo apt-get install cmake libsdl2-dev
 sudo apt install cmake
 ```
+The native-file-dialog needs this dependancy:
+
+```bash
+sudo apt install libgtk-3-dev
+```
+
 To build the project:
 
 ```bash
